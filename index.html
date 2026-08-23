@@ -1,0 +1,1523 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kira Photobooth - Special Edition</title>
+
+    <link rel="icon" type="image/png" href="assets/camera.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Indie+Flower&family=Patrick+Hand&family=VT323&display=swap"
+        rel="stylesheet">
+
+    <style>
+        /* --- Design System --- */
+        :root {
+            --paper-color: #fff5f7;
+            --ink-color: #4a2e3b;
+            --machine-body: #ffb6c1;
+            --machine-highlight: #ffd1dc;
+            --machine-shadow: #c86b81;
+            --metal-silver: #f4c2c2;
+            --screen-glow: rgba(255, 182, 193, 0.3);
+        }
+
+        /* Reset */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            outline: none;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: auto;
+            min-height: 100dvh;
+            /* Minimal setinggi layar */
+        }
+
+        body {
+            font-family: 'Patrick Hand', cursive;
+            background-color: #e0e0e0;
+            background-image:
+                linear-gradient(#cccccc 1px, transparent 1px),
+                linear-gradient(90deg, #cccccc 1px, transparent 1px);
+            background-size: 30px 30px;
+            background-position: -1px -1px;
+            color: var(--ink-color);
+            /* Body tetap rata atas agar halaman panjang bisa discroll */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 20px 10px;
+        }
+
+        #app-container {
+            width: 100%;
+            max-width: 480px;
+            /* Tinggi menyesuaikan konten, tapi minimal setinggi layar dikurangi padding agar bisa dicenter */
+            min-height: calc(100dvh - 40px);
+            height: auto;
+            position: relative;
+            overflow: visible;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Pages --- */
+        .page {
+            position: relative;
+            width: 100%;
+            height: auto;
+            /* Tinggi default menyesuaikan isi */
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            /* Default alignment: rata atas (untuk editor/landing) */
+            justify-content: flex-start;
+
+            background: var(--paper-color);
+            transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55), opacity 0.5s;
+            opacity: 0;
+            pointer-events: none;
+            display: none;
+            transform: translateY(50px);
+            z-index: 1;
+            border: 3px solid var(--ink-color);
+            border-radius: 2px 4px 2px 3px;
+            box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.1);
+            flex-grow: 1;
+            /* Biarkan page mengisi ruang container */
+        }
+
+        .page.active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+            z-index: 2;
+            display: flex;
+        }
+
+        .page.exit {
+            transform: translateY(-120%) rotate(-5deg);
+            opacity: 0;
+            z-index: 3;
+            display: flex;
+        }
+
+        /* Class Khusus untuk Halaman yang Centered */
+        .page.is-centered-page {
+            justify-content: center !important;
+            padding-top: 20px;
+            padding-bottom: 20px;
+        }
+
+        /* Khusus landing page */
+        #page-landing.page {
+            background: transparent;
+            border: none;
+            padding: 0;
+            box-shadow: none;
+            justify-content: center;
+        }
+
+        /* --- Typography & Elements --- */
+        h1 {
+            margin: 10px 0;
+            font-size: 2rem;
+            font-family: 'Indie Flower', cursive;
+            line-height: 1;
+        }
+
+        h2 {
+            margin: 10px 0;
+            font-size: 1.5rem;
+        }
+
+        p {
+            margin: 5px 0 15px 0;
+        }
+
+        .btn-sketchy {
+            background: #fff;
+            font-family: 'Patrick Hand', cursive;
+            font-size: 1.1rem;
+            padding: 10px 10px;
+            cursor: pointer;
+            border: 3px solid var(--ink-color);
+            border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+            transition: all 0.2s;
+            box-shadow: 4px 4px 0 var(--ink-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            color: var(--ink-color);
+        }
+
+        .btn-sketchy:active {
+            transform: translate(3px, 3px);
+            box-shadow: 0 0 0 var(--ink-color);
+        }
+
+        .btn-sketchy:hover {
+            background: var(--ink-color);
+            color: #fff;
+        }
+
+        .btn-secondary {
+            background: #ddd;
+            color: #333;
+            border-color: #333;
+            box-shadow: 3px 3px 0 #333;
+        }
+
+        .button-group {
+            display: flex;
+            width: 100%;
+            gap: 10px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .button-group button {
+            flex: 1;
+        }
+
+        /* --- Machine Styles --- */
+        .machine-cabinet {
+            width: 100%;
+            height: auto;
+            /* Biarkan memanjang */
+            min-height: 90dvh;
+            /* Minimal tinggi agar terlihat penuh */
+            background: linear-gradient(135deg, var(--machine-highlight) 0%, var(--machine-body) 50%, var(--machine-shadow) 100%);
+            border-right: 12px solid #1a1a1a;
+            border-bottom: 12px solid #1a1a1a;
+            border-left: 2px solid #555;
+            border-top: 2px solid #555;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.8), 15px 15px 40px rgba(0, 0, 0, 0.3);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            /* Tetap flex-start agar rapi dari atas */
+            gap: 25px;
+            /* Jarak antar elemen */
+        }
+
+        .machine-top-deco {
+            display: flex;
+            gap: 20px;
+            width: 100%;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .deco-lens {
+            width: 70px;
+            height: 70px;
+            background: #000;
+            border-radius: 50%;
+            border: 6px solid #333;
+            background-image: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.8) 2%, transparent 10%), radial-gradient(circle at 50% 50%, #000 50%, #222 70%, #555 100%);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .deco-flash {
+            width: 90px;
+            height: 35px;
+            background: #eee;
+            border: 4px solid #111;
+            border-radius: 2px;
+            background: repeating-linear-gradient(90deg, #fff, #fff 10px, #ddd 10px, #ddd 20px);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+            animation: strobeFlash 1s infinite steps(2);
+        }
+
+        @keyframes strobeFlash {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        .screen-bezel {
+            width: 100%;
+            max-width: 380px;
+            background: #222;
+            padding: 20px;
+            border-radius: 10px;
+            border: 3px solid #111;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+            position: relative;
+            flex: none;
+            /* Jangan stretch */
+            min-height: 280px;
+            /* Jaminan tinggi minimal */
+            height: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .screen-bezel::before,
+        .screen-bezel::after {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #555;
+            border-radius: 50%;
+            border: 2px solid #111;
+            top: 5px;
+        }
+
+        .screen-bezel::before {
+            left: 5px;
+        }
+
+        .screen-bezel::after {
+            right: 5px;
+        }
+
+        .screen-content {
+            background: var(--paper-color);
+            width: 100%;
+            height: 100%;
+            border: 6px solid #111;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            box-shadow: inset 0 0 50px var(--screen-glow);
+            position: relative;
+            overflow: hidden;
+            min-height: 240px;
+        }
+
+        .screen-content::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.1) 0px, rgba(0, 0, 0, 0.1) 1px, transparent 1px, transparent 3px);
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        /* --- Lock Screen --- */
+        .screen-section {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.3s, transform 0.3s;
+            position: absolute;
+            top: 0;
+            left: 0;
+            padding: 10px;
+        }
+
+        .screen-hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.9);
+        }
+
+        .sketchy-robot {
+            width: 80px;
+            height: 60px;
+            border: 4px dashed var(--ink-color);
+            border-radius: 10px;
+            position: relative;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: robotHover 2s ease-in-out infinite;
+        }
+
+        .sketchy-robot::before,
+        .sketchy-robot::after {
+            content: '';
+            position: absolute;
+            top: 15px;
+            width: 12px;
+            height: 12px;
+            background: var(--ink-color);
+            border-radius: 50%;
+            animation: robotBlink 3s infinite;
+        }
+
+        .sketchy-robot::before {
+            left: 18px;
+        }
+
+        .sketchy-robot::after {
+            right: 18px;
+        }
+
+        .robot-mouth {
+            width: 30px;
+            height: 8px;
+            border: 3px solid var(--ink-color);
+            border-top: none;
+            border-radius: 0 0 10px 10px;
+            margin-top: 15px;
+        }
+
+        @keyframes robotHover {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+
+        @keyframes robotBlink {
+
+            0%,
+            90%,
+            100% {
+                transform: scaleY(1);
+            }
+
+            95% {
+                transform: scaleY(0.1);
+            }
+        }
+
+        .date-select-container {
+            display: flex;
+            gap: 5px;
+            width: 90%;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        .terminal-select {
+            background: #000;
+            color: #0f0;
+            font-family: 'VT323', monospace;
+            border: 2px solid var(--ink-color);
+            padding: 4px 2px;
+            font-size: 1rem;
+            text-align: center;
+            text-align-last: center;
+            cursor: pointer;
+        }
+
+        .terminal-select option {
+            background: #111;
+            color: #0f0;
+        }
+
+        .terminal-input {
+            background: #000;
+            color: #0f0;
+            font-family: 'VT323', monospace;
+            border: 3px solid var(--ink-color);
+            padding: 5px 10px;
+            font-size: 1.2rem;
+            width: 80%;
+            text-align: center;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .terminal-btn {
+            background: var(--ink-color);
+            color: #fff;
+            font-family: 'VT323', monospace;
+            border: none;
+            padding: 5px 15px;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        .terminal-btn:active {
+            transform: scale(0.95);
+        }
+
+        .landing-icon {
+            width: 100px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .screen-content h1 {
+            font-size: 1.8rem;
+            margin: 5px 0;
+        }
+
+        /* --- Text Rotation Styles --- */
+        #screen-unlocked p {
+            transition: opacity 0.5s ease-in-out;
+            opacity: 1;
+            min-height: 1.2em;
+            display: flex;
+            align-items: center;
+            text-align: center;
+        }
+
+        #page-camera h2 {
+            transition: opacity 0.3s ease-in-out;
+            opacity: 1;
+        }
+
+        .fade-out {
+            opacity: 0 !important;
+        }
+
+        .control-panel {
+            width: 100%;
+            max-width: 380px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 15px;
+            background: linear-gradient(0deg, #999, #ccc);
+            border-radius: 5px;
+            border: 4px solid #222;
+            box-shadow: inset 0 5px 10px rgba(255, 255, 255, 0.5), 0 10px 20px rgba(0, 0, 0, 0.3);
+            flex-shrink: 0;
+        }
+
+        .coin-slot {
+            width: 50px;
+            height: 70px;
+            background: #444;
+            border: 3px solid #111;
+            border-radius: 2px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'VT323', monospace;
+            color: #fff;
+            font-size: 0.8rem;
+            text-align: center;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+        }
+
+        .coin-slot::after {
+            content: '';
+            width: 10px;
+            height: 30px;
+            background: #111;
+            margin-top: 8px;
+            border: 1px solid #666;
+        }
+
+        .big-red-button {
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle at 30% 30%, #ff4444, #990000);
+            border: 6px solid #222;
+            outline: 6px solid var(--metal-silver);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-family: 'VT323', monospace;
+            font-size: 2rem;
+            line-height: 1;
+            text-shadow: 0 2px 5px #000;
+            transition: all 0.1s;
+        }
+
+        .big-red-button:active {
+            transform: translateY(8px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
+            background: radial-gradient(circle at 50% 50%, #770000, #330000);
+        }
+
+        .big-red-button span {
+            font-size: 0.9rem;
+            font-family: 'Patrick Hand';
+            opacity: 0.7;
+            margin-top: 3px;
+        }
+
+        .btn-disabled {
+            filter: grayscale(100%) brightness(0.7);
+            pointer-events: none;
+            transform: translateY(5px) !important;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5) !important;
+        }
+
+        .levina-plaque {
+            width: 100%;
+            max-width: 380px;
+            padding: 8px;
+            text-align: center;
+            background: linear-gradient(45deg, #b0b0b0, #e0e0e0, #b0b0b0);
+            border: 3px solid #111;
+            border-radius: 4px;
+            box-shadow: inset 0 2px 5px rgba(255, 255, 255, 0.8), 0 5px 10px rgba(0, 0, 0, 0.3);
+            font-family: 'VT323', monospace;
+            color: #111;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 1rem;
+            position: relative;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+            flex-shrink: 0;
+        }
+
+        .levina-plaque::before,
+        .levina-plaque::after {
+            content: '+';
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #444;
+            font-family: sans-serif;
+            font-weight: bold;
+        }
+
+        .levina-plaque::before {
+            left: 6px;
+        }
+
+        .levina-plaque::after {
+            right: 6px;
+        }
+
+        /* --- Camera UI --- */
+        #camera-frame-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            aspect-ratio: 4/3;
+            background: #fff;
+            border: 4px solid var(--ink-color);
+            box-shadow: 8px 8px 0 var(--ink-color);
+            margin: 20px auto;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        #video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1);
+            border: 2px solid #000;
+            display: block;
+        }
+
+        #countdown-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 8rem;
+            font-family: 'Indie Flower';
+            color: var(--ink-color);
+            text-shadow: 4px 4px 0 #fff;
+            display: none;
+            z-index: 10;
+        }
+
+        #mini-gallery {
+            display: flex;
+            justify-content: center;
+            height: 60px;
+            width: 100%;
+            margin-top: 20px;
+            perspective: 500px;
+            flex-shrink: 0;
+        }
+
+        .mini-photo {
+            width: 50px;
+            height: 40px;
+            background: #eee;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            margin: 0 -15px;
+            transform: rotate(var(--r));
+            transition: transform 0.3s;
+            animation: tossIn 0.5s ease-out backwards;
+        }
+
+        @keyframes tossIn {
+            from {
+                transform: translateY(100px);
+                opacity: 0;
+            }
+        }
+
+        /* --- Preview & Editor --- */
+        #result-preview {
+            width: 100%;
+            max-width: 360px;
+            height: auto;
+            border: 4px solid #fff;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            margin-top: 15px;
+            margin-bottom: 20px;
+            transform: rotate(0deg);
+            cursor: zoom-in;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border-radius: 4px;
+        }
+
+        #result-preview:hover {
+            transform: scale(1.02);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        /* --- Fullscreen Modal Zoom --- */
+        #preview-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            cursor: zoom-out;
+            padding: 20px;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        #preview-modal img {
+            max-width: 95%;
+            max-height: 90vh;
+            object-fit: contain;
+            border: 6px solid #fff;
+            border-radius: 6px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .template-selector {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+            flex-shrink: 0;
+        }
+
+        .template-btn {
+            width: 50px;
+            height: 70px;
+            border: 3px solid #ccc;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            transition: 0.2s;
+            border-radius: 4px;
+            background: #fff;
+            color: var(--ink-color);
+        }
+
+        .template-btn.active {
+            border-color: var(--ink-color);
+            background: var(--ink-color);
+            color: #fff;
+            transform: scale(1.1);
+            box-shadow: 3px 3px 0 #999;
+        }
+
+        .template-btn.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            pointer-events: none;
+            filter: grayscale(100%);
+            background: #eee;
+        }
+
+        #editor-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--paper-color);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            transition: transform 0.3s ease-in-out;
+            transform: translateY(100%);
+            overflow-y: auto;
+            border: 3px solid var(--ink-color);
+        }
+
+        #editor-overlay.open {
+            transform: translateY(0);
+        }
+
+        .editor-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+            width: 100%;
+            flex-shrink: 0;
+        }
+
+        .editor-thumb {
+            width: 100%;
+            aspect-ratio: 4/3;
+            background: #ddd;
+            border: 4px solid transparent;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s;
+        }
+
+        .editor-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .editor-thumb.selected {
+            border-color: var(--ink-color);
+            transform: scale(1.05);
+            z-index: 2;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .editor-thumb.swap-target {
+            border-color: #999;
+            border-style: dashed;
+        }
+
+        .thumb-number {
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: var(--ink-color);
+            color: #fff;
+            width: 25px;
+            height: 25px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'VT323';
+        }
+
+        .editor-controls {
+            width: 100%;
+            background: #eee;
+            padding: 15px;
+            border-radius: 5px;
+            border: 3px solid var(--ink-color);
+            flex-shrink: 0;
+        }
+
+        .control-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            justify-content: space-between;
+        }
+
+        .control-row label {
+            font-size: 0.8rem;
+            width: 75px;
+            font-weight: bold;
+        }
+
+        input[type=range] {
+            flex: 1;
+            cursor: pointer;
+            accent-color: var(--ink-color);
+        }
+
+        .toggle-btn {
+            background: #fff;
+            border: 3px solid var(--ink-color);
+            padding: 8px 15px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+        }
+
+        .toggle-btn.active {
+            background: var(--ink-color);
+            color: #fff;
+        }
+
+        .mode-switch {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-shrink: 0;
+        }
+
+        #flash {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #fff;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 99;
+        }
+
+        .flash-anim {
+            animation: flashEffect 0.15s ease-out;
+        }
+
+        @keyframes flashEffect {
+            0% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* --- Saved Page --- */
+        .sketchy-success-icon {
+            width: 100px;
+            height: 100px;
+            border: 5px dashed var(--ink-color);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            animation: wobbleSlow 2s infinite ease-in-out;
+            background: #fff;
+            transform: rotate(-2deg);
+        }
+
+        .sketchy-success-icon span {
+            font-size: 4rem;
+            color: var(--ink-color);
+            font-family: 'Indie Flower', cursive;
+        }
+
+        @keyframes wobbleSlow {
+
+            0%,
+            100% {
+                transform: rotate(-2deg) scale(1);
+            }
+
+            50% {
+                transform: rotate(2deg) scale(1.05);
+            }
+        }
+
+        /* --- Media Queries Sederhana --- */
+        @media (max-width: 350px) {
+            .machine-cabinet {
+                padding: 15px;
+            }
+
+            .big-red-button {
+                width: 80px;
+                height: 80px;
+            }
+
+            .levina-plaque {
+                font-size: 0.8rem;
+                padding: 5px 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="app-container">
+
+        <div id="page-landing" class="page active">
+            <div class="machine-cabinet">
+
+                <div class="machine-top-deco">
+                    <div class="deco-lens"></div>
+                    <div class="deco-flash"></div>
+                </div>
+
+                <div class="screen-bezel">
+                    <div class="screen-content">
+
+                        <div id="screen-locked" class="screen-section">
+                            <div class="sketchy-robot">
+                                <div class="robot-mouth"></div>
+                            </div>
+                            <p style="font-family: 'VT323'; font-size: 1.1rem; text-align: center;">SYSTEM
+                                LOCKED.<br>VERIFY IDENTITY.</p>
+                            <p style="font-size: 0.9rem; margin-bottom: 5px;">Kapan ulang tahun Kira?</p>
+                            <div class="date-select-container">
+                                <select id="sel-day" class="terminal-select" style="flex: 1.2;">
+                                    <option value="">TGL</option>
+                                </select>
+                                <select id="sel-month" class="terminal-select" style="flex: 2.2;">
+                                    <option value="">BLN</option>
+                                </select>
+                                <select id="sel-year" class="terminal-select" style="flex: 1.8;">
+                                    <option value="">THN</option>
+                                </select>
+                            </div>
+                            <button class="terminal-btn" onclick="checkUnlock()">UNLOCK >></button>
+                            <p id="unlock-error"
+                                style="color: red; font-size: 0.8rem; display: none; margin-top: 5px; font-family: 'VT323';">
+                                ACCESS DENIED.</p>
+                        </div>
+
+                        <div id="screen-unlocked" class="screen-section screen-hidden">
+                            <img src="assets/camera.png" alt="Camera Doodle" class="landing-icon">
+                            <h1>Kira Photobooth</h1>
+                            <p>Siap2 dandan ya, mw difoto soalnya</p>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="control-panel">
+                    <div class="coin-slot">INSERT<br>TOKEN</div>
+                    <button id="physical-start-btn" class="big-red-button btn-disabled" onclick="goToCamera()">
+                        START
+                        <span>(Tekan!)</span>
+                    </button>
+                    <div style="font-family:'VT323'; font-size: 1.2rem; color: #222; text-align:center;">READY<br>TO GO
+                    </div>
+                </div>
+
+                <div class="levina-plaque">
+                    CUSTOM BUILT FOR: KIRA
+                </div>
+
+            </div>
+        </div>
+
+        <div id="page-camera" class="page is-centered-page">
+            <h2 style="font-size:1.2rem; margin:0; transition: opacity 0.3s; flex-shrink: 0;">Siap Pose!</h2>
+            <div id="camera-frame-wrapper">
+                <video id="video" autoplay playsinline></video>
+                <img id="camera-snapshot-preview" src="" alt="Snapshot Preview"
+                    style="display: none; width: 100%; height: 100%; object-fit: cover; border: 2px solid #000;">
+                <div id="countdown-overlay">3</div>
+            </div>
+
+            <div id="camera-action-controls"
+                style="display: none; gap: 10px; margin-top: 10px; width: 100%; max-width: 320px; flex-shrink: 0;">
+                <button class="btn-sketchy btn-secondary" style="flex: 1; font-size: 0.95rem; padding: 6px 8px;"
+                    onclick="retakeCurrentPhoto()">↺ Ulangi Foto Ini</button>
+                <button class="btn-sketchy" style="flex: 1; font-size: 0.95rem; padding: 6px 8px;"
+                    onclick="nextPhotoSegment()">Lanjut ➔</button>
+            </div>
+
+            <p id="camera-status-text"
+                style="font-size: 0.8rem; opacity: 0.7; margin-top: 5px; font-weight: bold; flex-shrink: 0;">
+                AUTO-CAPTURE
+                ENGAGED...</p>
+        </div>
+
+        <div id="page-processing" class="page is-centered-page" style="background: #f9ffeb;">
+            <img src="assets/loading_kirby.gif" alt="Loading Kirby"
+                style="width: 140px; height: auto; margin-bottom: 10px; border-radius: 8px;">
+            <p style="font-size: 0.95rem; opacity: 0.8; font-weight: bold; margin: 0;">proses yh</p>
+        </div>
+
+        <div id="page-editing" class="page">
+            <canvas id="final-canvas" class="hidden"></canvas>
+            <button class="btn-sketchy" style="width: 100%; margin-bottom: 10px; background: #eee; flex-shrink: 0;"
+                onclick="openEditor()">🔧 Adjust Filter & Posisi</button>
+
+            <div style="width: 100%; text-align: center;">
+                <img id="result-preview" src="" alt="Hasil" onclick="openPreviewModal()">
+                <p style="font-size: 0.8rem; opacity: 0.6; margin-top: -10px; margin-bottom: 15px; font-weight: bold;">
+                    🔍 Klik gambar untuk zoom / lihat penuh</p>
+            </div>
+
+            <div class="template-selector" style="display: none;">
+                <div class="template-btn active" onclick="setTemplate(1)">GRID</div>
+                <div class="template-btn" onclick="setTemplate(2)">STRIP</div>
+            </div>
+
+            <div class="button-group" style="flex-shrink: 0;">
+                <button class="btn-sketchy btn-secondary" onclick="confirmRetry()">↺ Ulangi (Reset)</button>
+                <button class="btn-sketchy" onclick="handleSaveAndShowSuccess()">⬇ Cetak HD & Selesai</button>
+            </div>
+        </div>
+
+        <div id="page-saved" class="page is-centered-page">
+            <div class="sketchy-success-icon">
+                <span>✔</span>
+            </div>
+            <h2 style="font-family: 'Indie Flower'; font-size: 2rem; margin-bottom: 10px;">Berhasil Disimpan!</h2>
+            <p style="font-family: 'Patrick Hand'; font-size: 1.3rem; text-align: center; max-width: 80%;">
+                Udah di-save HD nih! Jangan lupa di-post yak kalo bagus (kalo jelek simpen sendiri aja wkwk).
+            </p>
+            <div style="height: 30px;"></div>
+            <button class="btn-sketchy" style="width: 80%;" onclick="backToPreview()">⬅ Balik ke Preview</button>
+            <div style="margin-top: 15px; font-size: 0.9rem; opacity: 0.7;">
+                Atau mau foto ulang? Klik 'Balik ke Preview' lalu 'Ulangi'.
+            </div>
+        </div>
+
+        <div id="editor-overlay">
+            <h2 style="margin-top:0; flex-shrink: 0;">Panel Editing</h2>
+            <div class="mode-switch" style="flex-shrink: 0;">
+                <button id="btn-mode-adjust" class="toggle-btn active" onclick="setEditMode('adjust')">Adjust</button>
+                <button id="btn-mode-swap" class="toggle-btn" onclick="setEditMode('swap')">Swap</button>
+            </div>
+            <p id="editor-instruction"
+                style="font-size: 0.8rem; text-align: center; font-family: 'VT323'; flex-shrink: 0;">Pilih frame untuk
+                diedit.</p>
+            <div class="editor-grid" id="editor-grid"></div>
+
+            <div id="adjust-panel" class="editor-controls">
+                <div class="control-row"><label>Brightness</label><input type="range" id="sl-brightness" min="50"
+                        max="150" value="100" oninput="updatePhotoSettings()"></div>
+                <div class="control-row"><label>Contrast</label><input type="range" id="sl-contrast" min="50" max="150"
+                        value="100" oninput="updatePhotoSettings()"></div>
+                <div class="control-row"><label>Saturasi</label><input type="range" id="sl-saturation" min="0" max="200"
+                        value="100" oninput="updatePhotoSettings()"></div>
+                <div class="control-row"><label>Rona (Hue)</label><input type="range" id="sl-hue" min="0" max="360"
+                        value="0" oninput="updatePhotoSettings()"></div>
+                <div class="control-row"><label>Sepia</label><input type="range" id="sl-sepia" min="0" max="100"
+                        value="0" oninput="updatePhotoSettings()"></div>
+
+                <div class="control-row" style="justify-content: center; margin-top: 15px;">
+                    <button class="toggle-btn" id="btn-bnw" onclick="toggleBnW()">⚫⚪ Mode B&W</button>
+                </div>
+            </div>
+
+            <button class="btn-sketchy" style="margin-top: 20px; flex-shrink: 0;" onclick="closeEditor()">Dah Cakep,
+                slese</button>
+            <div style="height: 50px; flex-shrink: 0;"></div>
+        </div>
+
+    </div>
+    <div id="flash"></div>
+
+    <!-- Modal Fullscreen Zoom -->
+    <div id="preview-modal" onclick="closePreviewModal()">
+        <img id="modal-img" src="" alt="Full Preview">
+    </div>
+
+    <script>
+        // Config & State
+        const CONFIG = { count: 4, timer: 3, width: 1200, height: 1800 };
+        let state = {
+            stream: null, photos: [], photoConfigs: [], index: 0, template: 1,
+            isLocked: true
+        };
+        let editorState = { mode: 'adjust', selectedIndex: 0, swapSourceIndex: null };
+        const CORRECT_DAY = "23";
+        const CORRECT_MONTH = "08";
+        const CORRECT_YEAR = "2006";
+
+        const LANDING_PHRASES = [
+            "Siap2 dandan ya, mw difoto soalnya",
+            "Gausa alay",
+            "foto lah sekali2 sm customer jg gapapa",
+            "Mesin ini khusus dibuat untuk Kira soalnya lagi habede",
+            "ayo kor",
+            "Kamera ajaib khusus hari spesial Kira",
+            "Udah siap belum? gece pencet START"
+        ];
+
+        const CAMERA_PHRASES = [
+            "Siap Pose!",
+            "Gaya Bebas!",
+            "Senyum Pepsodent!",
+            "Gausah alay",
+            "Tahan Napas...",
+            "Lirik Kanan Dikit",
+            "Gaya Model Papan Atas!",
+            "Siap Ya!",
+            "1, 2, 3, CHEESE!",
+            "Tunjukkan Senyum Manismu Kir!"
+        ];
+
+        // DOM Elements
+        const pages = {
+            landing: document.getElementById('page-landing'),
+            camera: document.getElementById('page-camera'),
+            processing: document.getElementById('page-processing'),
+            editing: document.getElementById('page-editing'),
+            saved: document.getElementById('page-saved')
+        };
+
+        const video = document.getElementById('video'); const countdownEl = document.getElementById('countdown-overlay');
+        const finalCanvas = document.getElementById('final-canvas');
+        const resultPreview = document.getElementById('result-preview'); const flashEl = document.getElementById('flash');
+        const editorOverlay = document.getElementById('editor-overlay'); const editorGrid = document.getElementById('editor-grid');
+        const adjustPanel = document.getElementById('adjust-panel'); const editorInstruction = document.getElementById('editor-instruction');
+        const slBrightness = document.getElementById('sl-brightness'); const slContrast = document.getElementById('sl-contrast');
+        const slSaturation = document.getElementById('sl-saturation'); const slHue = document.getElementById('sl-hue');
+        const slSepia = document.getElementById('sl-sepia'); const btnBnW = document.getElementById('btn-bnw');
+
+        const screenLocked = document.getElementById('screen-locked');
+        const screenUnlocked = document.getElementById('screen-unlocked');
+        const landingText = document.querySelector('#screen-unlocked p');
+        const cameraTitle = document.querySelector('#page-camera h2');
+
+        const selDay = document.getElementById('sel-day');
+        const selMonth = document.getElementById('sel-month');
+        const selYear = document.getElementById('sel-year');
+        const unlockError = document.getElementById('unlock-error');
+        const physicalStartBtn = document.getElementById('physical-start-btn');
+
+        // Populate Date Dropdowns
+        const MONTH_NAMES = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+
+        for (let i = 1; i <= 31; i++) {
+            const val = i.toString().padStart(2, '0');
+            selDay.add(new Option(val, val));
+        }
+        MONTH_NAMES.forEach((name, idx) => {
+            const val = (idx + 1).toString().padStart(2, '0');
+            selMonth.add(new Option(name, val));
+        });
+        const currentYear = new Date().getFullYear();
+        for (let y = currentYear; y >= 1990; y--) {
+            selYear.add(new Option(y.toString(), y.toString()));
+        }
+
+        // Text Rotation Logic
+        let landingTextInterval;
+        let landingPhraseIndex = 0;
+
+        function startLandingTextRotation() {
+            if (landingTextInterval) clearInterval(landingTextInterval);
+            landingTextInterval = setInterval(() => {
+                landingText.classList.add('fade-out');
+                setTimeout(() => {
+                    landingPhraseIndex = (landingPhraseIndex + 1) % LANDING_PHRASES.length;
+                    landingText.innerText = LANDING_PHRASES[landingPhraseIndex];
+                    landingText.classList.remove('fade-out');
+                }, 500);
+            }, 2500);
+        }
+
+        function stopLandingTextRotation() {
+            if (landingTextInterval) clearInterval(landingTextInterval);
+        }
+
+        // Lock Screen Logic
+        function updateLockUI() {
+            if (state.isLocked) {
+                screenLocked.classList.remove('screen-hidden');
+                screenUnlocked.classList.add('screen-hidden');
+                physicalStartBtn.classList.add('btn-disabled');
+                stopLandingTextRotation();
+            } else {
+                screenLocked.classList.add('screen-hidden');
+                screenUnlocked.classList.remove('screen-hidden');
+                physicalStartBtn.classList.remove('btn-disabled');
+                startLandingTextRotation();
+            }
+        }
+
+        function checkUnlock() {
+            if (selDay.value === CORRECT_DAY && selMonth.value === CORRECT_MONTH && selYear.value === CORRECT_YEAR) {
+                state.isLocked = false;
+                unlockError.style.display = 'none';
+                updateLockUI();
+            } else {
+                unlockError.style.display = 'block';
+                const container = document.querySelector('.date-select-container');
+                container.style.animation = "wobble 0.3s";
+                setTimeout(() => { container.style.animation = ""; }, 300);
+            }
+        }
+        updateLockUI();
+
+        // Navigation
+        function switchPage(fromPage, toPage) {
+            // Scroll ke atas saat pindah halaman
+            window.scrollTo(0, 0);
+            fromPage.classList.add('exit'); fromPage.classList.remove('active'); toPage.scrollTop = 0;
+            setTimeout(() => { toPage.classList.add('active'); fromPage.classList.remove('exit'); }, 300);
+        }
+
+        const cameraActionControls = document.getElementById('camera-action-controls');
+        const cameraStatusText = document.getElementById('camera-status-text');
+
+        // Camera Flow
+        async function goToCamera() {
+            if (state.isLocked) return;
+            stopLandingTextRotation();
+            try {
+                state.photos = []; state.photoConfigs = []; state.index = 0;
+                cameraActionControls.style.display = 'none';
+                cameraStatusText.style.display = 'block';
+                cameraStatusText.innerText = "AUTO-CAPTURE ENGAGED...";
+                // Meminta resolusi yang lebih masuk akal untuk mobile agar tidak terlalu berat
+                state.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } } });
+                video.srcObject = state.stream; switchPage(pages.landing, pages.camera); setTimeout(runSequence, 1500);
+            } catch (err) { alert("Gagal akses sistem kamera: " + err + ". Pastikan izin kamera diberikan di browser."); }
+        }
+
+        const cameraSnapshotPreview = document.getElementById('camera-snapshot-preview');
+
+        function runSequence() {
+            if (state.index >= CONFIG.count) { endCapture(); return; }
+            cameraActionControls.style.display = 'none';
+            cameraStatusText.style.display = 'block';
+            cameraStatusText.innerText = "AUTO-CAPTURE ENGAGED...";
+
+            // Sembunyikan preview snapshot, kembalikan video stream live
+            cameraSnapshotPreview.style.display = 'none';
+            video.style.display = 'block';
+
+            cameraTitle.classList.add('fade-out');
+            setTimeout(() => {
+                const randomPhrase = CAMERA_PHRASES[Math.floor(Math.random() * CAMERA_PHRASES.length)];
+                cameraTitle.innerText = `[Foto ${state.index + 1}/${CONFIG.count}] ${randomPhrase}`;
+                cameraTitle.classList.remove('fade-out');
+                let count = CONFIG.timer; countdownEl.style.display = 'block'; countdownEl.innerText = count;
+                const timerInt = setInterval(() => {
+                    count--;
+                    if (count > 0) {
+                        countdownEl.innerText = count;
+                    } else {
+                        clearInterval(timerInt);
+                        countdownEl.style.display = 'none';
+                        snap();
+                    }
+                }, 1000);
+            }, 300);
+        }
+
+        function snap() {
+            flashEl.classList.add('flash-anim'); setTimeout(() => flashEl.classList.remove('flash-anim'), 500);
+            const vW = video.videoWidth; const vH = video.videoHeight;
+            const canvas = document.createElement('canvas'); canvas.width = vW; canvas.height = vH;
+            const ctx = canvas.getContext('2d'); ctx.translate(vW, 0); ctx.scale(-1, 1); ctx.drawImage(video, 0, 0);
+            state.photos.push(canvas);
+            state.photoConfigs.push({ brightness: 100, contrast: 100, grayscale: 0, saturation: 100, hue: 0, sepia: 0 });
+            // Override video dengan hasil foto jepretan di bingkai besar!
+            cameraSnapshotPreview.src = canvas.toDataURL('image/jpeg', 0.9);
+            video.style.display = 'none';
+            cameraSnapshotPreview.style.display = 'block';
+
+            // Jeda di setiap foto & tampilkan tombol opsi (Lanjut / Retake)
+            cameraStatusText.style.display = 'none';
+            cameraActionControls.style.display = 'flex';
+            cameraTitle.innerText = `Foto ${state.index + 1} Selesai! Review dulu yh`;
+        }
+
+        function nextPhotoSegment() {
+            state.index++;
+            if (state.index >= CONFIG.count) {
+                endCapture();
+            } else {
+                runSequence();
+            }
+        }
+
+        function retakeCurrentPhoto() {
+            // Hapus foto terakhir dari state
+            state.photos.pop();
+            state.photoConfigs.pop();
+            runSequence();
+        }
+
+        function endCapture() { if (state.stream) state.stream.getTracks().forEach(t => t.stop()); switchPage(pages.camera, pages.processing); setTimeout(() => { generateResult(); switchPage(pages.processing, pages.editing); }, 2500); }
+
+        function confirmRetry() {
+            if (confirm("Ulangi sesi foto? Foto saat ini akan dihapus.")) {
+                resetSession();
+            }
+        }
+
+        function resetSession() {
+            state.photos = [];
+            state.photoConfigs = [];
+            state.index = 0;
+            editorOverlay.classList.remove('open');
+            switchPage(pages.editing, pages.landing);
+            startLandingTextRotation();
+        }
+
+        function setTemplate(t) { state.template = t; document.querySelectorAll('.template-btn').forEach((b, i) => { if (i + 1 === t) b.classList.add('active'); else b.classList.remove('active'); }); generateResult(); }
+
+        // Editor Logic
+        function openEditor() { renderEditorGrid(); setEditMode('adjust'); selectPhotoForEdit(0); editorOverlay.classList.add('open'); }
+        function closeEditor() { editorOverlay.classList.remove('open'); generateResult(); }
+        function setEditMode(mode) {
+            editorState.mode = mode; document.getElementById('btn-mode-adjust').classList.toggle('active', mode === 'adjust'); document.getElementById('btn-mode-swap').classList.toggle('active', mode === 'swap');
+            if (mode === 'swap') { adjustPanel.classList.add('hidden'); editorInstruction.innerText = "Klik dua frame untuk menukar posisi."; editorState.swapSourceIndex = null; document.querySelectorAll('.editor-thumb').forEach(el => el.classList.remove('selected')); }
+            else { adjustPanel.classList.remove('hidden'); editorInstruction.innerText = "Klik frame untuk kalibrasi."; selectPhotoForEdit(editorState.selectedIndex); }
+        }
+        function getFilterString(cfg) { return `brightness(${cfg.brightness}%) contrast(${cfg.contrast}%) grayscale(${cfg.grayscale}) saturate(${cfg.saturation}%) hue-rotate(${cfg.hue}deg) sepia(${cfg.sepia}%)`; }
+        function renderEditorGrid() {
+            editorGrid.innerHTML = ''; state.photos.forEach((photoCanvas, i) => {
+                const div = document.createElement('div'); div.className = 'editor-thumb'; div.onclick = () => handleThumbClick(i);
+                const img = document.createElement('img'); img.src = photoCanvas.toDataURL(); img.style.filter = getFilterString(state.photoConfigs[i]); img.id = `thumb-img-${i}`;
+                const num = document.createElement('div'); num.className = 'thumb-number'; num.innerText = i + 1; div.appendChild(img); div.appendChild(num); editorGrid.appendChild(div);
+            });
+        }
+        function handleThumbClick(i) { if (editorState.mode === 'adjust') selectPhotoForEdit(i); else handleSwapLogic(i); }
+        function selectPhotoForEdit(index) {
+            editorState.selectedIndex = index; document.querySelectorAll('.editor-thumb').forEach((el, i) => { if (i === index) el.classList.add('selected'); else el.classList.remove('selected'); });
+            const cfg = state.photoConfigs[index];
+            slBrightness.value = cfg.brightness; slContrast.value = cfg.contrast; slSaturation.value = cfg.saturation; slHue.value = cfg.hue; slSepia.value = cfg.sepia;
+            btnBnW.classList.toggle('active', cfg.grayscale > 0);
+        }
+        function handleSwapLogic(index) {
+            const thumbs = document.querySelectorAll('.editor-thumb');
+            if (editorState.swapSourceIndex === null) { editorState.swapSourceIndex = index; thumbs[index].classList.add('swap-target'); }
+            else { const idx1 = editorState.swapSourceIndex; const idx2 = index; if (idx1 !== idx2) { [state.photos[idx1], state.photos[idx2]] = [state.photos[idx2], state.photos[idx1]]; [state.photoConfigs[idx1], state.photoConfigs[idx2]] = [state.photoConfigs[idx2], state.photoConfigs[idx1]]; renderEditorGrid(); } editorState.swapSourceIndex = null; }
+        }
+        function updatePhotoSettings() {
+            const idx = editorState.selectedIndex; const cfg = state.photoConfigs[idx];
+            cfg.brightness = slBrightness.value; cfg.contrast = slContrast.value; cfg.saturation = slSaturation.value; cfg.hue = slHue.value; cfg.sepia = slSepia.value;
+            const img = document.getElementById(`thumb-img-${idx}`); if (img) img.style.filter = getFilterString(cfg);
+        }
+        function toggleBnW() {
+            const idx = editorState.selectedIndex; const cfg = state.photoConfigs[idx];
+            cfg.grayscale = (cfg.grayscale === 0) ? 1 : 0;
+            btnBnW.classList.toggle('active', cfg.grayscale > 0);
+            updatePhotoSettings();
+        }
+
+        // Rendering
+        function generateResult() {
+            finalCanvas.width = CONFIG.width; finalCanvas.height = CONFIG.height; const ctx = finalCanvas.getContext('2d');
+            ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, CONFIG.width, CONFIG.height);
+            let tSrc = "", positions = [], pW, pH;
+            if (state.template === 1) {
+                tSrc = "assets/template_grid.png";
+                positions = [
+                    { x: 75, y: 550, w: 505, h: 395 },
+                    { x: 620, y: 550, w: 505, h: 395 },
+                    { x: 75, y: 1040, w: 505, h: 395 },
+                    { x: 620, y: 1040, w: 505, h: 395 }
+                ];
+            } else {
+                tSrc = "assets/template_strip.png";
+                positions = [
+                    { x: 360, y: 145, w: 480, h: 325 },
+                    { x: 360, y: 535, w: 480, h: 325 },
+                    { x: 360, y: 925, w: 480, h: 325 },
+                    { x: 360, y: 1315, w: 480, h: 325 }
+                ];
+            }
+            state.photos.forEach((img, i) => {
+                if (positions[i]) {
+                    const cfg = state.photoConfigs[i];
+                    const pos = positions[i];
+                    ctx.save();
+                    ctx.filter = getFilterString(cfg);
+                    drawImageProp(ctx, img, pos.x, pos.y, pos.w, pos.h);
+                    ctx.restore();
+                }
+            });
+            const overlay = new Image();
+            overlay.src = tSrc;
+            overlay.onload = () => { ctx.drawImage(overlay, 0, 0, CONFIG.width, CONFIG.height); updatePreview(); };
+            overlay.onerror = () => { updatePreview(); };
+        }
+        function updatePreview() {
+            resultPreview.src = finalCanvas.toDataURL('image/jpeg', 0.9);
+        }
+
+        const previewModal = document.getElementById('preview-modal');
+        const modalImg = document.getElementById('modal-img');
+
+        function openPreviewModal() {
+            if (resultPreview.src) {
+                modalImg.src = resultPreview.src;
+                previewModal.style.display = 'flex';
+            }
+        }
+
+        function closePreviewModal() {
+            previewModal.style.display = 'none';
+        }
+
+
+        function drawImageProp(ctx, img, x, y, w, h, offsetX, offsetY) { if (arguments.length === 2) { x = y = 0; w = ctx.canvas.width; h = ctx.canvas.height; } offsetX = typeof offsetX === "number" ? offsetX : 0.5; offsetY = typeof offsetY === "number" ? offsetY : 0.5; if (offsetX < 0) offsetX = 0; if (offsetY < 0) offsetY = 0; if (offsetX > 1) offsetX = 1; if (offsetY > 1) offsetY = 1; var iw = img.width, ih = img.height, r = Math.min(w / iw, h / ih), nw = iw * r, nh = ih * r, cx, cy, cw, ch, ar = 1; if (nw < w) ar = w / nw; if (Math.abs(ar - 1) < 1e-14 && nh < h) ar = h / nh; nw *= ar; nh *= ar; cw = iw / (nw / w); ch = ih / (nh / h); cx = (iw - cw) * offsetX; cy = (ih - ch) * offsetY; if (cx < 0) cx = 0; if (cy < 0) cy = 0; if (cw > iw) cw = iw; if (ch > ih) ch = ih; ctx.drawImage(img, cx, cy, cw, ch, x, y, w, h); }
+        function strokeRect(ctx, x, y, w, h) { ctx.strokeStyle = "#111"; ctx.lineWidth = 8; ctx.lineCap = "round"; ctx.beginPath(); ctx.moveTo(x - 2, y - 2); ctx.lineTo(x + w + 5, y + 3); ctx.lineTo(x + w - 2, y + h + 4); ctx.lineTo(x + 3, y + h - 2); ctx.lineTo(x - 4, y + 5); ctx.stroke(); }
+
+
+        function handleSaveAndShowSuccess() {
+            const link = document.createElement('a');
+            link.download = 'Kira-Photobooth-' + Date.now() + '.jpg';
+            link.href = finalCanvas.toDataURL('image/jpeg', 1.0);
+            link.click();
+            switchPage(pages.editing, pages.saved);
+        }
+
+
+        function backToPreview() {
+            switchPage(pages.saved, pages.editing);
+        }
+    </script>
+</body>
+
+</html>
