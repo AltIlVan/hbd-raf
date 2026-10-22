@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Aurel Photobooth - Special Edition</title>
+    <title>Rafli Photobooth - Special Edition</title>
 
     <link rel="icon" type="image/png" href="assets/camera.png">
     <link rel="shortcut icon" type="image/png" href="assets/camera.png">
@@ -17,13 +17,13 @@
     <style>
         /* --- Design System --- */
         :root {
-            --paper-color: #fdfbf7;
-            --ink-color: #3b2219;
-            --machine-body: #fce79a;
-            --machine-highlight: #fff3be;
-            --machine-shadow: #d4a73b;
-            --metal-silver: #eedbb2;
-            --screen-glow: rgba(252, 231, 154, 0.35);
+            --paper-color: #f0f4ff;
+            --ink-color: #0d1b4b;
+            --machine-body: #1e3a8a;
+            --machine-highlight: #3b5fc0;
+            --machine-shadow: #0a1f5c;
+            --metal-silver: #93c5fd;
+            --screen-glow: rgba(59, 130, 246, 0.35);
         }
 
         /* Reset */
@@ -47,8 +47,8 @@
 
         body {
             font-family: 'Patrick Hand', cursive;
-            background-color: #f5eedc;
-            background-image: radial-gradient(#d8c7a5 18%, transparent 19%);
+            background-color: #e8f0fe;
+            background-image: radial-gradient(#93c5fd 18%, transparent 19%);
             background-size: 24px 24px;
             color: var(--ink-color);
             /* Body tetap rata atas agar halaman panjang bisa discroll */
@@ -263,19 +263,19 @@
             width: 100%;
             max-width: 380px;
             background: #222;
-            padding: 20px;
+            padding: 14px;
             border-radius: 10px;
             border: 3px solid #111;
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
             position: relative;
             flex: none;
-            /* Jangan stretch */
             min-height: 280px;
-            /* Jaminan tinggi minimal */
             height: auto;
             display: flex;
-            align-items: center;
-            justify-content: center;
+            flex-direction: column;
+            align-items: stretch;
+            justify-content: flex-start;
+            box-sizing: border-box;
         }
 
         .screen-bezel::before,
@@ -301,7 +301,7 @@
         .screen-content {
             background: var(--paper-color);
             width: 100%;
-            height: 100%;
+            flex: 1;
             border: 6px solid #111;
             display: flex;
             flex-direction: column;
@@ -312,6 +312,7 @@
             position: relative;
             overflow: hidden;
             min-height: 240px;
+            box-sizing: border-box;
         }
 
         .screen-content::after {
@@ -973,6 +974,299 @@
             }
         }
 
+        /* --- Industrial Bolts --- */
+        .bolt {
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            background: radial-gradient(circle at 35% 35%, #e2e8f0 0%, #94a3b8 50%, #475569 100%);
+            border-radius: 50%;
+            border: 1.5px solid #0f172a;
+            box-shadow: inset 0 1px 1px #fff, 0 2px 4px rgba(0, 0, 0, 0.4);
+            z-index: 5;
+        }
+
+        .bolt::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 20%;
+            right: 20%;
+            height: 2px;
+            background: #1e293b;
+            transform: translateY(-50%) rotate(45deg);
+        }
+
+        .bolt-tl { top: 12px; left: 12px; }
+        .bolt-tr { top: 12px; right: 12px; }
+        .bolt-bl { bottom: 12px; left: 12px; }
+        .bolt-br { bottom: 12px; right: 12px; }
+
+        /* --- Cabinet Stickers (Decals) --- */
+        .cabinet-sticker {
+            position: absolute;
+            font-family: 'VT323', monospace;
+            font-size: 0.95rem;
+            padding: 3px 10px;
+            border: 2px solid #0f172a;
+            border-radius: 4px;
+            box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.3);
+            z-index: 7;
+            pointer-events: none;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        .sticker-1 {
+            top: -10px;
+            left: 10px;
+            background: #facc15;
+            color: #0f172a;
+            transform: rotate(-5deg);
+        }
+
+        .sticker-2 {
+            top: -10px;
+            right: 10px;
+            background: #38bdf8;
+            color: #0f172a;
+            transform: rotate(4deg);
+        }
+
+        .sticker-3 {
+            bottom: 50px;
+            left: -8px;
+            background: #fb7185;
+            color: #fff;
+            transform: rotate(-3deg);
+        }
+
+        /* --- CRT Ticker Bar --- */
+        .crt-ticker {
+            width: 100%;
+            background: #020617;
+            color: #38bdf8;
+            font-family: 'VT323', monospace;
+            font-size: 0.95rem;
+            padding: 4px 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 2px solid #1e3a8a;
+            letter-spacing: 1px;
+            box-sizing: border-box;
+            border-radius: 6px 6px 0 0;
+            margin-bottom: 8px;
+        }
+
+        .ticker-dot {
+            width: 8px;
+            height: 8px;
+            background: #22c55e;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #22c55e;
+            animation: blinkGlow 1s infinite alternate;
+        }
+
+        @keyframes blinkGlow {
+            from { opacity: 0.3; }
+            to { opacity: 1; }
+        }
+
+        /* --- Hazard Ring Around Start Button --- */
+        .hazard-ring {
+            padding: 7px;
+            border-radius: 50%;
+            background: repeating-linear-gradient(
+                -45deg,
+                #eab308,
+                #eab308 10px,
+                #09090b 10px,
+                #09090b 20px
+            );
+            border: 3px solid #111;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5), inset 0 0 4px rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* --- Retro Cassette Processing Animation --- */
+        .retro-cassette {
+            width: 190px;
+            height: 120px;
+            background: #1e293b;
+            border: 4px solid #0f172a;
+            border-radius: 12px;
+            padding: 8px;
+            position: relative;
+            box-shadow: 6px 6px 0 var(--ink-color);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cassette-label {
+            width: 100%;
+            height: 100%;
+            background: #f8fafc;
+            border: 2px solid #0f172a;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px;
+            box-sizing: border-box;
+        }
+
+        .cassette-title {
+            font-family: 'VT323', monospace;
+            font-size: 1rem;
+            color: #0f172a;
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+
+        .cassette-window {
+            width: 85%;
+            height: 42px;
+            background: #334155;
+            border-radius: 20px;
+            border: 2px solid #0f172a;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 0 10px;
+            box-sizing: border-box;
+        }
+
+        .cassette-spool {
+            width: 26px;
+            height: 26px;
+            background: #f8fafc;
+            border-radius: 50%;
+            border: 3px dashed #0f172a;
+            animation: spinSpool 1.5s linear infinite;
+        }
+
+        @keyframes spinSpool {
+            100% { transform: rotate(360deg); }
+        }
+
+        .retro-progress-box {
+            width: 100%;
+            max-width: 280px;
+            background: #020617;
+            border: 3px solid var(--ink-color);
+            padding: 12px;
+            border-radius: 6px;
+            box-shadow: 5px 5px 0 var(--ink-color);
+            text-align: center;
+            color: #38bdf8;
+            font-family: 'VT323', monospace;
+            box-sizing: border-box;
+        }
+
+        .retro-progress-bar {
+            width: 100%;
+            height: 14px;
+            background: #0f172a;
+            border: 1px solid #38bdf8;
+            margin: 8px 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                90deg,
+                #38bdf8 0px,
+                #38bdf8 8px,
+                transparent 8px,
+                transparent 12px
+            );
+            animation: progressScan 1.5s linear infinite;
+        }
+
+        @keyframes progressScan {
+            from { transform: translateX(-30%); }
+            to { transform: translateX(0%); }
+        }
+
+        /* --- KKN Receipt (Saved Page) --- */
+        .kkn-receipt {
+            width: 100%;
+            max-width: 330px;
+            background: #fffdf5;
+            border: 3px solid #0f172a;
+            box-shadow: 6px 6px 0 var(--ink-color);
+            padding: 16px 14px;
+            font-family: 'VT323', monospace;
+            color: #0f172a;
+            position: relative;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+            border-radius: 4px;
+        }
+
+        .receipt-header {
+            text-align: center;
+            border-bottom: 2px dashed #0f172a;
+            padding-bottom: 8px;
+            margin-bottom: 8px;
+        }
+
+        .receipt-header h3 {
+            margin: 0;
+            font-size: 1.4rem;
+            letter-spacing: 1px;
+        }
+
+        .receipt-header p {
+            margin: 2px 0;
+            font-size: 0.95rem;
+            opacity: 0.85;
+        }
+
+        .receipt-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.05rem;
+            margin: 4px 0;
+        }
+
+        .receipt-row.total {
+            font-weight: bold;
+            font-size: 1.2rem;
+            border-top: 2px dashed #0f172a;
+            padding-top: 6px;
+            margin-top: 8px;
+            color: #1e3a8a;
+        }
+
+        .receipt-footer {
+            text-align: center;
+            border-top: 2px dashed #0f172a;
+            padding-top: 8px;
+            margin-top: 10px;
+        }
+
+        .receipt-footer p {
+            margin: 3px 0;
+            font-size: 0.95rem;
+        }
+
+        .receipt-barcode {
+            font-size: 1.6rem;
+            letter-spacing: 4px;
+            margin-top: 6px;
+            font-weight: bold;
+        }
+
         /* --- Media Queries Sederhana --- */
         @media (max-width: 350px) {
             .machine-cabinet {
@@ -998,6 +1292,16 @@
 
         <div id="page-landing" class="page active">
             <div class="machine-cabinet">
+                <!-- Industrial corner bolts -->
+                <div class="bolt bolt-tl"></div>
+                <div class="bolt bolt-tr"></div>
+                <div class="bolt bolt-bl"></div>
+                <div class="bolt bolt-br"></div>
+
+                <!-- Custom KKN & Bestie stickers -->
+                <div class="cabinet-sticker sticker-1">🏕️ KKN SURVIVOR</div>
+                <div class="cabinet-sticker sticker-2">⭐ 100% CERTIFIED BRO</div>
+                <div class="cabinet-sticker sticker-3">⚡ POSKO 2004</div>
 
                 <div class="machine-top-deco">
                     <div class="deco-lens"></div>
@@ -1005,6 +1309,12 @@
                 </div>
 
                 <div class="screen-bezel">
+                    <!-- CRT Monitor Ticker -->
+                    <div class="crt-ticker">
+                        <span class="ticker-dot"></span>
+                        <span>SYS: ONLINE // LOC: POSKO KKN // TARGET: RAFLI</span>
+                    </div>
+
                     <div class="screen-content">
 
                         <div id="screen-locked" class="screen-section">
@@ -1013,7 +1323,7 @@
                             </div>
                             <p style="font-family: 'VT323'; font-size: 1.1rem; text-align: center;">SYSTEM
                                 LOCKED.<br>VERIFY IDENTITY.</p>
-                            <p style="font-size: 0.9rem; margin-bottom: 5px;">Kapan ulang tahun Aurel?</p>
+                            <p style="font-size: 0.9rem; margin-bottom: 5px;">Kapan ulang tahun Rafli?</p>
                             <div class="date-select-container">
                                 <select id="sel-day" class="terminal-select" style="flex: 1.2;">
                                     <option value="">TGL</option>
@@ -1033,8 +1343,8 @@
 
                         <div id="screen-unlocked" class="screen-section screen-hidden">
                             <img src="assets/camera.png" alt="Camera Doodle" class="landing-icon">
-                            <h1>Aurel Photobooth</h1>
-                            <p>sebuah peringatan kecil2 an dari belahan duo rel mu</p>
+                            <h1>Rafli Photobooth</h1>
+                            <p>sebuah bingkisan kecil dari teman KKN-mu</p>
                         </div>
 
                     </div>
@@ -1042,16 +1352,18 @@
 
                 <div class="control-panel">
                     <div class="coin-slot">INSERT<br>TOKEN</div>
-                    <button id="physical-start-btn" class="big-red-button btn-disabled" onclick="goToCamera()">
-                        START
-                        <span>(Tekan!)</span>
-                    </button>
+                    <div class="hazard-ring">
+                        <button id="physical-start-btn" class="big-red-button btn-disabled" onclick="goToCamera()">
+                            START
+                            <span>(Tekan!)</span>
+                        </button>
+                    </div>
                     <div style="font-family:'VT323'; font-size: 1.2rem; color: #222; text-align:center;">READY<br>TO GO
                     </div>
                 </div>
 
                 <div class="levina-plaque">
-                    CUSTOM BUILT FOR: AUREL
+                    ★ SPECIAL CUSTOM UNIT // BUILT FOR: RAFLI (KKN VETERAN) ★
                 </div>
 
             </div>
@@ -1080,10 +1392,23 @@
                 ENGAGED...</p>
         </div>
 
-        <div id="page-processing" class="page is-centered-page" style="background: #f9ffeb;">
-            <img src="assets/loading_kirby.gif" alt="Loading Kirby"
-                style="width: 140px; height: auto; margin-bottom: 10px; border-radius: 8px;">
-            <p style="font-size: 0.95rem; opacity: 0.8; font-weight: bold; margin: 0;">proses yh</p>
+        <div id="page-processing" class="page is-centered-page" style="background: #e8f0fe;">
+            <div class="retro-cassette">
+                <div class="cassette-label">
+                    <span class="cassette-title">📼 KKN POSKO MIX - RAFLI</span>
+                    <div class="cassette-window">
+                        <div class="cassette-spool"></div>
+                        <div class="cassette-spool"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="retro-progress-box">
+                <div style="font-size: 1.15rem; letter-spacing: 1px; font-weight: bold;">MENYUSUN MEMORI POSKO KKN...</div>
+                <div class="retro-progress-bar">
+                    <div class="progress-fill"></div>
+                </div>
+                <div style="font-size: 0.9rem; opacity: 0.85;">[ RENDER HD PHOTO • SPECIAL BESTIE ]</div>
+            </div>
         </div>
 
         <div id="page-editing" class="page">
@@ -1109,17 +1434,31 @@
         </div>
 
         <div id="page-saved" class="page is-centered-page">
-            <div class="sketchy-success-icon">
-                <span>✔</span>
+            <div class="kkn-receipt">
+                <div class="receipt-header">
+                    <h3>★★★ POSKO KKN ARCHIVE ★★★</h3>
+                    <p>OFFICIAL BROTHERHOOD RECEIPT</p>
+                    <p>ID: #RFL-21102004 | OPS: BRO KKN</p>
+                    <div style="margin-top: 4px; letter-spacing: 1px;">================================</div>
+                </div>
+                <div class="receipt-body">
+                    <div class="receipt-row"><span>1x Teman Begadang Posko</span><span>Priceless</span></div>
+                    <div class="receipt-row"><span>1x Partner Curhat & Ngopi</span><span>Priceless</span></div>
+                    <div class="receipt-row"><span>1x Pejuang Proker KKN</span><span>Priceless</span></div>
+                    <div class="receipt-row"><span>1x Bestie Anti-Wacana</span><span>Priceless</span></div>
+                    <div class="receipt-row"><span>1x Solidaritas Seumur Hidup</span><span>LIFETIME</span></div>
+                    <div class="receipt-row total"><span>TOTAL BILL:</span><span>UNCONDITIONAL BRO</span></div>
+                </div>
+                <div class="receipt-footer">
+                    <p style="font-weight: bold; font-size: 1.05rem; color: #1e3a8a;">★★★ LULUS KKN, TETAP BRO! ★★★</p>
+                    <p>Semoga makin sukses, berkah, dan solid terus!</p>
+                    <div class="receipt-barcode">||| | ||||| || |||| ||| |||||</div>
+                </div>
             </div>
-            <h2 style="font-family: 'Indie Flower'; font-size: 2rem; margin-bottom: 10px;">Berhasil Disimpan!</h2>
-            <p style="font-family: 'Patrick Hand'; font-size: 1.3rem; text-align: center; max-width: 80%;">
-                Udah di-save HD nih! Jangan lupa di-post yak kalo bagus (kalo jelek simpen sendiri aja wkwk).
-            </p>
-            <div style="height: 30px;"></div>
+            <h2 style="font-family: 'Indie Flower'; font-size: 1.8rem; margin: 0 0 10px 0;">Foto Berhasil Disimpan HD!</h2>
             <button class="btn-sketchy" style="width: 80%;" onclick="backToPreview()">⬅ Balik ke Preview</button>
             <div style="margin-top: 15px; font-size: 0.9rem; opacity: 0.7;">
-                Atau mau foto ulang? Klik 'Balik ke Preview' lalu 'Ulangi'.
+                Mau foto ulang? Klik 'Balik ke Preview' lalu 'Ulangi'.
             </div>
         </div>
 
@@ -1163,8 +1502,92 @@
     <div id="preview-modal" onclick="closePreviewModal()">
         <img id="modal-img" src="" alt="Full Preview">
     </div>
-
     <script>
+        // SoundFX Synthesizer (Zero External File Dependencies)
+        const SoundFX = {
+            ctx: null,
+            init() {
+                if (!this.ctx) {
+                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                    if (AudioCtx) this.ctx = new AudioCtx();
+                }
+                if (this.ctx && this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            },
+            beep(freq = 600, type = 'square', duration = 0.08, gainVal = 0.1) {
+                try {
+                    this.init();
+                    if (!this.ctx) return;
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+                    gain.gain.setValueAtTime(gainVal, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + duration);
+                } catch (e) { }
+            },
+            click() {
+                this.beep(800, 'triangle', 0.04, 0.08);
+            },
+            unlock() {
+                try {
+                    this.init();
+                    if (!this.ctx) return;
+                    const notes = [440, 554, 659, 880];
+                    notes.forEach((freq, i) => {
+                        setTimeout(() => this.beep(freq, 'sine', 0.15, 0.15), i * 90);
+                    });
+                } catch (e) { }
+            },
+            countdown(isFinal = false) {
+                if (isFinal) {
+                    this.beep(1200, 'square', 0.25, 0.2);
+                } else {
+                    this.beep(880, 'square', 0.12, 0.15);
+                }
+            },
+            shutter() {
+                try {
+                    this.init();
+                    if (!this.ctx) return;
+                    const bufferSize = Math.floor(this.ctx.sampleRate * 0.15);
+                    const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+                    const data = buffer.getChannelData(0);
+                    for (let i = 0; i < bufferSize; i++) {
+                        data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.25));
+                    }
+                    const noise = this.ctx.createBufferSource();
+                    noise.buffer = buffer;
+                    const filter = this.ctx.createBiquadFilter();
+                    filter.type = 'bandpass';
+                    filter.frequency.value = 1400;
+                    const gain = this.ctx.createGain();
+                    gain.gain.setValueAtTime(0.35, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.15);
+                    noise.connect(filter);
+                    filter.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    noise.start();
+                    setTimeout(() => this.beep(400, 'triangle', 0.05, 0.15), 50);
+                } catch (e) { }
+            },
+            success() {
+                try {
+                    this.init();
+                    if (!this.ctx) return;
+                    const chord = [523.25, 659.25, 783.99, 1046.50];
+                    chord.forEach((freq, idx) => {
+                        setTimeout(() => this.beep(freq, 'triangle', 0.35, 0.18), idx * 110);
+                    });
+                } catch (e) { }
+            }
+        };
+
         // Config & State
         const CONFIG = { count: 4, timer: 3, width: 1200, height: 1800 };
         let state = {
@@ -1172,30 +1595,30 @@
             isLocked: true
         };
         let editorState = { mode: 'adjust', selectedIndex: 0, swapSourceIndex: null };
-        const CORRECT_DAY = "08";
+        const CORRECT_DAY = "21";
         const CORRECT_MONTH = "10";
-        const CORRECT_YEAR = "2003";
+        const CORRECT_YEAR = "2004";
 
         const LANDING_PHRASES = [
-            "sebuah peringatan kecil2 an dari belahan duo rel mu",
-            "met ultah yang mpiqs",
-            "you are not alone, at least im here",
-            "octo-friends ya kita kalo dipikir2",
-            "Siap2 dandan ya Rell, mw difoto nih",
-            "Mesin ini khusus dibuat untuk Aurelsss",
-            "Udah siap belum Rell? buruan pencet START!"
+            "spesial buat bro terbaik dari KKN",
+            "met ultah Rafli, bro! semoga makin ganteng 🎉",
+            "KKN kelar, tapi persahabatannya ga bakal kelar",
+            "dari orang yang mau bilang: makasih udah jadi bagian ceritaku",
+            "udah siap pose, bro? mesin ini nunggu kamu!",
+            "Mesin ini khusus dibikin buat si Rafli!",
+            "Udah siap belum bro? buruan pencet START!"
         ];
 
         const CAMERA_PHRASES = [
-            "Siap Pose, Rell!",
-            "Gaya Bebas!",
+            "Siap Pose, Bro!",
+            "Gaya Bebas, Rafli!",
             "Senyum Pepsodent!",
-            "Tunjukkan senyum manismu Aurel!",
+            "Tunjukkin aura bestie KKN-mu!",
             "Tahan Napas...",
-            "Lirik Kanan Dikit",
+            "Lirik Kanan Dikit, Bro!",
             "Gaya Model Papan Atas!",
             "1, 2, 3, CHEESE!",
-            "Lucu banget sih Rell!",
+            "Ganteng banget sih Rafli!",
             "Pose andalan keluarin sekarang!"
         ];
 
@@ -1244,6 +1667,10 @@
             selYear.add(new Option(y.toString(), y.toString()));
         }
 
+        [selDay, selMonth, selYear].forEach(el => {
+            el.addEventListener('change', () => SoundFX.click());
+        });
+
         // Text Rotation Logic
         let landingTextInterval;
         let landingPhraseIndex = 0;
@@ -1283,9 +1710,11 @@
             if (selDay.value === CORRECT_DAY && selMonth.value === CORRECT_MONTH && selYear.value === CORRECT_YEAR) {
                 state.isLocked = false;
                 unlockError.style.display = 'none';
+                SoundFX.unlock();
                 updateLockUI();
             } else {
                 unlockError.style.display = 'block';
+                SoundFX.beep(220, 'sawtooth', 0.25, 0.2);
                 const container = document.querySelector('.date-select-container');
                 container.style.animation = "wobble 0.3s";
                 setTimeout(() => { container.style.animation = ""; }, 300);
@@ -1295,7 +1724,6 @@
 
         // Navigation
         function switchPage(fromPage, toPage) {
-            // Scroll ke atas saat pindah halaman
             window.scrollTo(0, 0);
             fromPage.classList.add('exit'); fromPage.classList.remove('active'); toPage.scrollTop = 0;
             setTimeout(() => { toPage.classList.add('active'); fromPage.classList.remove('exit'); }, 300);
@@ -1307,13 +1735,13 @@
         // Camera Flow
         async function goToCamera() {
             if (state.isLocked) return;
+            SoundFX.click();
             stopLandingTextRotation();
             try {
                 state.photos = []; state.photoConfigs = []; state.index = 0;
                 cameraActionControls.style.display = 'none';
                 cameraStatusText.style.display = 'block';
                 cameraStatusText.innerText = "AUTO-CAPTURE ENGAGED...";
-                // Meminta resolusi yang lebih masuk akal untuk mobile agar tidak terlalu berat
                 state.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } } });
                 video.srcObject = state.stream; switchPage(pages.landing, pages.camera); setTimeout(runSequence, 1500);
             } catch (err) { alert("Gagal akses sistem kamera: " + err + ". Pastikan izin kamera diberikan di browser."); }
@@ -1327,7 +1755,6 @@
             cameraStatusText.style.display = 'block';
             cameraStatusText.innerText = "AUTO-CAPTURE ENGAGED...";
 
-            // Sembunyikan preview snapshot, kembalikan video stream live
             cameraSnapshotPreview.style.display = 'none';
             video.style.display = 'block';
 
@@ -1337,13 +1764,16 @@
                 cameraTitle.innerText = `[Foto ${state.index + 1}/${CONFIG.count}] ${randomPhrase}`;
                 cameraTitle.classList.remove('fade-out');
                 let count = CONFIG.timer; countdownEl.style.display = 'block'; countdownEl.innerText = count;
+                SoundFX.countdown(false);
                 const timerInt = setInterval(() => {
                     count--;
                     if (count > 0) {
                         countdownEl.innerText = count;
+                        SoundFX.countdown(false);
                     } else {
                         clearInterval(timerInt);
                         countdownEl.style.display = 'none';
+                        SoundFX.countdown(true);
                         snap();
                     }
                 }, 1000);
@@ -1351,24 +1781,24 @@
         }
 
         function snap() {
+            SoundFX.shutter();
             flashEl.classList.add('flash-anim'); setTimeout(() => flashEl.classList.remove('flash-anim'), 500);
             const vW = video.videoWidth; const vH = video.videoHeight;
             const canvas = document.createElement('canvas'); canvas.width = vW; canvas.height = vH;
             const ctx = canvas.getContext('2d'); ctx.translate(vW, 0); ctx.scale(-1, 1); ctx.drawImage(video, 0, 0);
             state.photos.push(canvas);
             state.photoConfigs.push({ brightness: 100, contrast: 100, grayscale: 0, saturation: 100, hue: 0, sepia: 0 });
-            // Override video dengan hasil foto jepretan di bingkai besar!
             cameraSnapshotPreview.src = canvas.toDataURL('image/jpeg', 0.9);
             video.style.display = 'none';
             cameraSnapshotPreview.style.display = 'block';
 
-            // Jeda di setiap foto & tampilkan tombol opsi (Lanjut / Retake)
             cameraStatusText.style.display = 'none';
             cameraActionControls.style.display = 'flex';
             cameraTitle.innerText = `Foto ${state.index + 1} Selesai! Review dulu yh`;
         }
 
         function nextPhotoSegment() {
+            SoundFX.click();
             state.index++;
             if (state.index >= CONFIG.count) {
                 endCapture();
@@ -1378,7 +1808,7 @@
         }
 
         function retakeCurrentPhoto() {
-            // Hapus foto terakhir dari state
+            SoundFX.click();
             state.photos.pop();
             state.photoConfigs.pop();
             runSequence();
@@ -1387,6 +1817,7 @@
         function endCapture() { if (state.stream) state.stream.getTracks().forEach(t => t.stop()); switchPage(pages.camera, pages.processing); setTimeout(() => { generateResult(); switchPage(pages.processing, pages.editing); }, 2500); }
 
         function confirmRetry() {
+            SoundFX.click();
             if (confirm("Ulangi sesi foto? Foto saat ini akan dihapus.")) {
                 resetSession();
             }
@@ -1401,12 +1832,13 @@
             startLandingTextRotation();
         }
 
-        function setTemplate(t) { state.template = t; document.querySelectorAll('.template-btn').forEach((b, i) => { if (i + 1 === t) b.classList.add('active'); else b.classList.remove('active'); }); generateResult(); }
+        function setTemplate(t) { SoundFX.click(); state.template = t; document.querySelectorAll('.template-btn').forEach((b, i) => { if (i + 1 === t) b.classList.add('active'); else b.classList.remove('active'); }); generateResult(); }
 
         // Editor Logic
-        function openEditor() { renderEditorGrid(); setEditMode('adjust'); selectPhotoForEdit(0); editorOverlay.classList.add('open'); }
-        function closeEditor() { editorOverlay.classList.remove('open'); generateResult(); }
+        function openEditor() { SoundFX.click(); renderEditorGrid(); setEditMode('adjust'); selectPhotoForEdit(0); editorOverlay.classList.add('open'); }
+        function closeEditor() { SoundFX.click(); editorOverlay.classList.remove('open'); generateResult(); }
         function setEditMode(mode) {
+            SoundFX.click();
             editorState.mode = mode; document.getElementById('btn-mode-adjust').classList.toggle('active', mode === 'adjust'); document.getElementById('btn-mode-swap').classList.toggle('active', mode === 'swap');
             if (mode === 'swap') { adjustPanel.classList.add('hidden'); editorInstruction.innerText = "Klik dua frame untuk menukar posisi."; editorState.swapSourceIndex = null; document.querySelectorAll('.editor-thumb').forEach(el => el.classList.remove('selected')); }
             else { adjustPanel.classList.remove('hidden'); editorInstruction.innerText = "Klik frame untuk kalibrasi."; selectPhotoForEdit(editorState.selectedIndex); }
@@ -1419,7 +1851,7 @@
                 const num = document.createElement('div'); num.className = 'thumb-number'; num.innerText = i + 1; div.appendChild(img); div.appendChild(num); editorGrid.appendChild(div);
             });
         }
-        function handleThumbClick(i) { if (editorState.mode === 'adjust') selectPhotoForEdit(i); else handleSwapLogic(i); }
+        function handleThumbClick(i) { SoundFX.click(); if (editorState.mode === 'adjust') selectPhotoForEdit(i); else handleSwapLogic(i); }
         function selectPhotoForEdit(index) {
             editorState.selectedIndex = index; document.querySelectorAll('.editor-thumb').forEach((el, i) => { if (i === index) el.classList.add('selected'); else el.classList.remove('selected'); });
             const cfg = state.photoConfigs[index];
@@ -1437,17 +1869,19 @@
             const img = document.getElementById(`thumb-img-${idx}`); if (img) img.style.filter = getFilterString(cfg);
         }
         function toggleBnW() {
+            SoundFX.click();
             const idx = editorState.selectedIndex; const cfg = state.photoConfigs[idx];
             cfg.grayscale = (cfg.grayscale === 0) ? 1 : 0;
             btnBnW.classList.toggle('active', cfg.grayscale > 0);
             updatePhotoSettings();
         }
 
+        // Custom Canvas Helpers
         // Rendering
         function generateResult() {
             finalCanvas.width = CONFIG.width; finalCanvas.height = CONFIG.height; const ctx = finalCanvas.getContext('2d');
             ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, CONFIG.width, CONFIG.height);
-            let tSrc = "", positions = [], pW, pH;
+            let tSrc = "", positions = [];
             if (state.template === 1) {
                 tSrc = "assets/template_grid.png";
                 positions = [
@@ -1480,6 +1914,7 @@
             overlay.onload = () => { ctx.drawImage(overlay, 0, 0, CONFIG.width, CONFIG.height); updatePreview(); };
             overlay.onerror = () => { updatePreview(); };
         }
+
         function updatePreview() {
             resultPreview.src = finalCanvas.toDataURL('image/jpeg', 0.9);
         }
@@ -1498,21 +1933,41 @@
             previewModal.style.display = 'none';
         }
 
+        function drawImageProp(ctx, img, x, y, w, h, offsetX, offsetY) {
+            if (arguments.length === 2) { x = y = 0; w = ctx.canvas.width; h = ctx.canvas.height; }
+            offsetX = typeof offsetX === "number" ? offsetX : 0.5;
+            offsetY = typeof offsetY === "number" ? offsetY : 0.5;
+            if (offsetX < 0) offsetX = 0; if (offsetY < 0) offsetY = 0;
+            if (offsetX > 1) offsetX = 1; if (offsetY > 1) offsetY = 1;
+            var iw = img.width, ih = img.height, r = Math.min(w / iw, h / ih),
+                nw = iw * r, nh = ih * r, cx, cy, cw, ch, ar = 1;
+            if (nw < w) ar = w / nw;
+            if (Math.abs(ar - 1) < 1e-14 && nh < h) ar = h / nh;
+            nw *= ar; nh *= ar; cw = iw / (nw / w); ch = ih / (nh / h);
+            cx = (iw - cw) * offsetX; cy = (ih - ch) * offsetY;
+            if (cx < 0) cx = 0; if (cy < 0) cy = 0;
+            if (cw > iw) cw = iw; if (ch > ih) ch = ih;
+            ctx.drawImage(img, cx, cy, cw, ch, x, y, w, h);
+        }
 
-        function drawImageProp(ctx, img, x, y, w, h, offsetX, offsetY) { if (arguments.length === 2) { x = y = 0; w = ctx.canvas.width; h = ctx.canvas.height; } offsetX = typeof offsetX === "number" ? offsetX : 0.5; offsetY = typeof offsetY === "number" ? offsetY : 0.5; if (offsetX < 0) offsetX = 0; if (offsetY < 0) offsetY = 0; if (offsetX > 1) offsetX = 1; if (offsetY > 1) offsetY = 1; var iw = img.width, ih = img.height, r = Math.min(w / iw, h / ih), nw = iw * r, nh = ih * r, cx, cy, cw, ch, ar = 1; if (nw < w) ar = w / nw; if (Math.abs(ar - 1) < 1e-14 && nh < h) ar = h / nh; nw *= ar; nh *= ar; cw = iw / (nw / w); ch = ih / (nh / h); cx = (iw - cw) * offsetX; cy = (ih - ch) * offsetY; if (cx < 0) cx = 0; if (cy < 0) cy = 0; if (cw > iw) cw = iw; if (ch > ih) ch = ih; ctx.drawImage(img, cx, cy, cw, ch, x, y, w, h); }
-        function strokeRect(ctx, x, y, w, h) { ctx.strokeStyle = "#111"; ctx.lineWidth = 8; ctx.lineCap = "round"; ctx.beginPath(); ctx.moveTo(x - 2, y - 2); ctx.lineTo(x + w + 5, y + 3); ctx.lineTo(x + w - 2, y + h + 4); ctx.lineTo(x + 3, y + h - 2); ctx.lineTo(x - 4, y + 5); ctx.stroke(); }
-
+        function strokeRect(ctx, x, y, w, h) {
+            ctx.strokeStyle = "#111"; ctx.lineWidth = 8; ctx.lineCap = "round";
+            ctx.beginPath(); ctx.moveTo(x - 2, y - 2); ctx.lineTo(x + w + 5, y + 3);
+            ctx.lineTo(x + w - 2, y + h + 4); ctx.lineTo(x + 3, y + h - 2);
+            ctx.lineTo(x - 4, y + 5); ctx.stroke();
+        }
 
         function handleSaveAndShowSuccess() {
+            SoundFX.success();
             const link = document.createElement('a');
-            link.download = 'Aurel-Photobooth-' + Date.now() + '.jpg';
+            link.download = 'Rafli-Photobooth-' + Date.now() + '.jpg';
             link.href = finalCanvas.toDataURL('image/jpeg', 1.0);
             link.click();
             switchPage(pages.editing, pages.saved);
         }
 
-
         function backToPreview() {
+            SoundFX.click();
             switchPage(pages.saved, pages.editing);
         }
     </script>
